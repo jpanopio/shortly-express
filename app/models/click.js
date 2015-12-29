@@ -3,7 +3,7 @@ var Link = require('./link.js')
 
 var Click = db.Model.extend({
   tableName: 'clicks',
-  hasTimestamps: true,
+  hasTimestamps: false,
   link: function() {
     return this.belongsTo(Link, 'link_id');
   }

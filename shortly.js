@@ -29,10 +29,10 @@ function(req, res) {
   var username = req.body.username;
   var password = req.body.password;
 
-  if(!username && !password) {
-    // res.redirect('/login');
-    res.req.path = '/login';
-  }
+  // if(!username && !password) {
+  //   // res.redirect('/login');
+  //   res.req.path = '/login';
+  // }
 
   res.render('index');
 });
@@ -87,9 +87,6 @@ function(req, res) {
   var pass = req.body.password;
 
   new User({username: user, password: pass}).fetch().then(function(found) {
-    console.log("username -->", user);
-    console.log("password -->", pass);
-
     if(found) {
       // Redirect to the sign in page
       res.redirect('/login');
