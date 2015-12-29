@@ -25,6 +25,14 @@ app.use(express.static(__dirname + '/public'));
 
 app.get('/', 
 function(req, res) {
+
+  var username = req.body.username;
+  var password = req.body.password;
+
+  if(!username && !password) {
+    res.redirect('/login');
+  }
+  
   res.render('index');
 });
 

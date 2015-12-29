@@ -9,6 +9,8 @@ var Link = db.Model.extend({
     visits: 0
   },
   clicks: function() {
+    //double check but this is likely a bookshelf function that establishes relationships between 
+    //database tables
     return this.hasMany(Click);
   },
   initialize: function(){
