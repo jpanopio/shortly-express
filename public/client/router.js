@@ -4,6 +4,7 @@ Shortly.Router = Backbone.Router.extend({
   },
 
   routes: {
+    //add routes??
     '':       'index',
     'create': 'create'
   },

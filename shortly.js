@@ -26,13 +26,13 @@ app.use(express.static(__dirname + '/public'));
 app.get('/', 
 function(req, res) {
 
-  var username = req.body.username;
+  /*var username = req.body.username;
   var password = req.body.password;
 
   if(!username && !password) {
     res.redirect('/login');
-  }
-  
+  }*/
+
   res.render('index');
 });
 
@@ -75,6 +75,31 @@ function(req, res) {
         .then(function(newLink) {
           res.send(200, newLink);
         });
+      });
+    }
+  });
+});
+
+app.post('/signup', 
+function(req, res) {
+  var user = req.body.username;
+  var pass = req.body.password;
+
+  new User({username: user, password: pass}).fetch().then(function(found) {
+    console.log("username -->", user);
+    console.log("password -->", pass);
+
+    if(found) {
+      console.log("User already exists");
+
+      // Redirect to the sign in page
+    } else {
+      console.log('Creating user');
+      Users.create({
+        username: user,
+        password: pass
+      }).then(function(newUser) {
+        res.send(201, newUser);
       });
     }
   });
