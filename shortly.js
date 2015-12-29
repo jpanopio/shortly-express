@@ -3,6 +3,8 @@ var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
 
+var session = require('express-session');
+
 
 var db = require('./app/config');
 var Users = require('./app/collections/users');
@@ -22,28 +24,34 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 
+app.use(session( {
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: false
+}));
 
-app.get('/', 
+var checkUser = function(req, res, next){
+  if(req.session.username){
+    console.log('User found');
+    next();
+  } else {
+    res.redirect('/login');
+  }
+}
+
+app.get('/', checkUser, 
 function(req, res) {
-
-  var username = req.body.username;
-  var password = req.body.password;
-
-  // if(!username && !password) {
-  //   // res.redirect('/login');
-  //   res.req.path = '/login';
-  // }
-
   res.render('index');
 });
 
-app.get('/create', 
+app.get('/create', checkUser,
 function(req, res) {
   res.render('index');
 });
 
-app.get('/links', 
+app.get('/links', checkUser,
 function(req, res) {
+  console.log(req.session.username);
   Links.reset().fetch().then(function(links) {
     res.send(200, links.models);
   });
@@ -81,6 +89,11 @@ function(req, res) {
   });
 });
 
+app.get('/signup', 
+function(req, res) {
+  res.render('signup');
+});
+
 app.post('/signup', 
 function(req, res) {
   var user = req.body.username;
@@ -91,17 +104,23 @@ function(req, res) {
       // Redirect to the sign in page
       res.redirect('/login');
     } else {
-      console.log('Creating user');
       Users.create({
         username: user,
         password: pass
       }).then(function(newUser) {
         //NOTE --> ask HIR why this wouldn't work: res.send(201, newUser);
+        req.session.username = user;
         res.redirect('/');
       });
     }
   });
 });
+
+app.get('/login', 
+  function(req, res){
+    res.render('login');
+  }
+);
 
 app.post('/login', 
 function(req, res) {
@@ -109,9 +128,8 @@ function(req, res) {
   var pass = req.body.password;
 
   new User({username: user, password: pass}).fetch().then(function(found) {
-    console.log("New user --> ", user);
-    console.log("New pass --> ", pass);
     if(found){
+      req.session.username = user;
       res.redirect('/');
     } else {
       res.redirect('/login');

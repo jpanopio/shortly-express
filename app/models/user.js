@@ -9,7 +9,6 @@ var User = db.Model.extend({
   hasTimestamps: false,
   //may add a foreign key later if we decide to build a users_links join table...
   initialize: function() {
-    console.log("initializing");
     // this.on('creating', function(model, attrs, options) {
     //   bcrypt.genSalt(10, function(err, salt) {
     //     //the bcrypt.hash method takes in a password, salts it, and then uses a callback function to ultimately update
