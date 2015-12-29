@@ -26,12 +26,13 @@ app.use(express.static(__dirname + '/public'));
 app.get('/', 
 function(req, res) {
 
-  /*var username = req.body.username;
+  var username = req.body.username;
   var password = req.body.password;
 
   if(!username && !password) {
-    res.redirect('/login');
-  }*/
+    // res.redirect('/login');
+    res.req.path = '/login';
+  }
 
   res.render('index');
 });
@@ -90,18 +91,33 @@ function(req, res) {
     console.log("password -->", pass);
 
     if(found) {
-      console.log("User already exists");
-
       // Redirect to the sign in page
+      res.redirect('/login');
     } else {
       console.log('Creating user');
       Users.create({
         username: user,
         password: pass
       }).then(function(newUser) {
-        // res.send(201, newUser);
+        //NOTE --> ask HIR why this wouldn't work: res.send(201, newUser);
         res.redirect('/');
       });
+    }
+  });
+});
+
+app.post('/login', 
+function(req, res) {
+  var user = req.body.username;
+  var pass = req.body.password;
+
+  new User({username: user, password: pass}).fetch().then(function(found) {
+    console.log("New user --> ", user);
+    console.log("New pass --> ", pass);
+    if(found){
+      res.redirect('/');
+    } else {
+      res.redirect('/login');
     }
   });
 });
