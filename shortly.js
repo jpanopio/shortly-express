@@ -99,7 +99,8 @@ function(req, res) {
         username: user,
         password: pass
       }).then(function(newUser) {
-        res.send(201, newUser);
+        // res.send(201, newUser);
+        res.redirect('/');
       });
     }
   });
