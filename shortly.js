@@ -2,6 +2,7 @@ var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
+var bcrypt = require('bcrypt-nodejs');
 
 var session = require('express-session');
 
@@ -32,7 +33,6 @@ app.use(session( {
 
 var checkUser = function(req, res, next){
   if(req.session.username){
-    console.log('User found');
     next();
   } else {
     res.redirect('/login');
@@ -99,6 +99,15 @@ function(req, res) {
   var user = req.body.username;
   var pass = req.body.password;
 
+  bcrypt.genSalt(10, function(err, salt) {
+    bcrypt.hash(pass, salt, null, function(err, hash) {
+      pass = hash;
+      console.log(pass);
+    });
+  });
+
+  console.log('Signup password: ', pass);
+
   new User({username: user, password: pass}).fetch().then(function(found) {
     if(found) {
       // Redirect to the sign in page
@@ -127,10 +136,14 @@ function(req, res) {
   var user = req.body.username;
   var pass = req.body.password;
 
-  new User({username: user, password: pass}).fetch().then(function(found) {
+  new User({username: user}).fetch().then(function(found) {
     if(found){
-      req.session.username = user;
-      res.redirect('/');
+      bcrypt.compare(pass, found.attributes.password, function(err, response) {
+        if(response) {
+          req.session.username = user;
+          res.redirect('/');
+        }
+      });
     } else {
       res.redirect('/login');
     }
